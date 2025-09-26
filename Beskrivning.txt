@@ -34,9 +34,9 @@ Programmet ska:
 - Allt i godkänt.
 - Använda klasser för att modellera spelare och spelet.
 - Implementera en highscore-funktion:
-- Räkna antal vinster för spelare respektive dealer.
-- Visa ställningen efter varje runda.
-- Detta ska sparas i fil på datorn som läses in vid start och sparas när spelet avslutas.
+    - Räkna antal vinster för spelare respektive dealer.
+    - Visa ställningen efter varje runda.
+    - Detta ska sparas i fil på datorn som läses in vid start och sparas när spelet avslutas.
 - Du ska även ha gjort några (minst 3) tester för ditt spel (du behöver inte ha gjort för allt) och motivera varför du har skrivit dina tester som du gjort och vad du vill testa. Detta kan du skriva som kommenterar i anslutning till testerna.
 
 # INLÄMNING #
