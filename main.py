@@ -134,7 +134,7 @@ while play_game:
     if answer.lower() == "yes":
         print(f"NICE!! So you've won {game.player.wins} times and I've won {game.dealer.wins}")
     elif answer.lower() == "no":
-        print(f"Okay, then we'll leave it at...\nplayer: {game.player.wins}\ndealer: {game.dealer.wins}. Coward")
+        print(f"Okay, then we'll leave it at...\nplayer: {game.player.wins}\ndealer: {game.dealer.wins}")
         game.player.calculate_highscore()
         game.dealer.calculate_highscore()
         game.save_file("highscores.txt")
