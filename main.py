@@ -119,26 +119,27 @@ class Game:
         self.player.reset()
         self.dealer.reset()
 
-game = Game()
-play_game = True
-while play_game:
-    game.play_a_round()
-    while True:
-        try:
-            answer = input("Wanna play another round? Write 'Yes' or 'No':\n")
-            if answer.lower() not in ["yes", "no"]:
-                raise ValueError()
-            break 
-        except ValueError:
-            print(f"Uuuuuuhm????? Not a valid input! Write 'yes' or 'no'")     
-    if answer.lower() == "yes":
-        print(f"NICE!! So you've won {game.player.wins} times and I've won {game.dealer.wins}")
-    elif answer.lower() == "no":
-        print(f"Okay, then we'll leave it at...\nplayer: {game.player.wins}\ndealer: {game.dealer.wins}")
-        game.player.calculate_highscore()
-        game.dealer.calculate_highscore()
-        game.save_file("highscores.txt")
-        play_game = False
-        break
+if __name__ == "__main__":
+    game = Game()
+    play_game = True
+    while play_game:
+        game.play_a_round()
+        while True:
+            try:
+                answer = input("Wanna play another round? Write 'Yes' or 'No':\n")
+                if answer.lower() not in ["yes", "no"]:
+                    raise ValueError()
+                break 
+            except ValueError:
+                print(f"Uuuuuuhm????? Not a valid input! Write 'yes' or 'no'")     
+        if answer.lower() == "yes":
+            print(f"NICE!! So you've won {game.player.wins} times and I've won {game.dealer.wins}")
+        elif answer.lower() == "no":
+            print(f"Okay, then we'll leave it at...\nplayer: {game.player.wins}\ndealer: {game.dealer.wins}")
+            game.player.calculate_highscore()
+            game.dealer.calculate_highscore()
+            game.save_file("highscores.txt")
+            play_game = False
+            break
 
 
