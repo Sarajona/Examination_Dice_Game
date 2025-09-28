@@ -40,7 +40,7 @@ class Game:
                 lines = list(map(lambda row: row.strip(), file))
                 self.player.highscore = int(lines[0])
                 self.dealer.highscore = int(lines[1])
-                print(f"Your previous highscore i {self.player.highscore} and my previous highscore is {self.dealer.highscore}")
+                print(f"Your previous highscore is {self.player.highscore} and my previous highscore is {self.dealer.highscore}")
         except FileNotFoundError:
             self.player.highscore = 0
             self.dealer.highscore = 0
@@ -59,62 +59,81 @@ class Game:
         else:
             print("Highscores file has been updated")
 
-    def play_a_round(self):
-        
-        #Players turn
-        while self.player.total_score < 21:
+    def ask_input(self, prompt, valid_options):
+        while True:
             try:
-                roll_or_stop = input("Would you like to roll or stop? Write 'Roll' or 'Stop':\n")
-                if roll_or_stop.lower() not in ["roll", "stop"]:
-                    raise ValueError()
+                answer = input(prompt).lower()
+                if answer not in valid_options:
+                    raise ValueError
+                return answer
             except ValueError:
-                print("No. That is not a valid value. If you wont play right I'm telling mummy")
-            if roll_or_stop.lower() == "roll":
+                print("That is not a valid value. If you wont play right I'm telling mummy!")
+
+    def players_turn(self):
+        while self.player.total_score < 21:
+            roll_or_stop = self.ask_input("Would you like to roll or stop? Write 'Roll' or 'Stop':\n", ["roll", "stop"])
+            if roll_or_stop == "roll":
                 self.player.roll()
                 self.player.calculate_total()
                 if self.player.total_score > 21:
-                    print(f"Mwuahaha! You've lost, I win!")
-                    self.dealer.wins += 1
-                    self.player.reset()
-                    self.dealer.reset()
-                    return
+                    return "bust"
                 if self.player.total_score == 21:
-                    print("oh... well congratualtions... you win. Whatever")
-                    self.player.wins += 1
-                    self.player.reset()
-                    self.dealer.reset()
-                    return
-            elif roll_or_stop.lower() == "stop":
+                    return "win"
+            else:
                 print(f"Okay then, your final score is {self.player.total_score}. Now it's my turn!")
                 break
+        return "stop"
 
-        #Dealers turn
+    def dealers_turn(self):
         while self.dealer.total_score < 17:
             self.dealer.roll()
             self.dealer.calculate_total()     
             if self.dealer.total_score > 21:
-                print(f"Aw shucks... I guess you... win... Whatever")
-                self.player.wins += 1
-                self.player.reset()
-                self.dealer.reset()
-                return
+                return "bust"
             elif self.dealer.total_score == 21:
-                print(f"WOHOO!! I win! In your face!!!")
-                self.dealer.wins += 1
-                self.player.reset()
-                self.dealer.reset()
-                return
+                return "win"
+        return "stop"
         
-        # Comparing scores
-        if self.dealer.total_score == self.player.total_score:
-            print("Hmm I guess we're even... that's no fun.")    
+    def comparing_scores(self, players_result, dealers_result):
+        #Player scores over 21
+        if players_result == "bust":
+            self.dealer.wins += 1
+            print("Mwuahaha! You've lost, I win!")
+            self.player.reset()
+            self.dealer.reset()
+            return
+        # Dealer scores over 21
+        elif dealers_result == "bust":
+            self.player.wins += 1
+            print(f"Aw shucks... I guess you... win... Whatever")
+            self.player.reset()
+            self.dealer.reset()
+            return
+        #Player scores 21
+        elif players_result == "win":
+            self.player.wins += 1
+            print("oh... well congratualtions... you win. Whatever")
+            self.player.reset()
+            self.dealer.reset()
+            return
+        #Dealer scores 21
+        elif dealers_result == "win":
+            self.dealer.wins +=1
+            print(f"WOHOO!! I win! In your face!!!")
+            self.player.reset()
+            self.dealer.reset()
+            return
+        #Tie
+        elif self.dealer.total_score == self.player.total_score:
+            print("Hmm it's a tie... that's no fun.") 
+        #Dealer scores higher than player
         elif self.dealer.total_score > self.player.total_score:
             self.dealer.wins += 1
             print(f"BOOM, I win. I'm the BEST!!")
+        #Player scores higher than dealer
         else:
             self.player.wins += 1
-            print(f"Uuuuhm, I guess I have to stop here and admit you win. But it's just a game so whatever... Don't let it get to you're head")
-        
+            print(f"Uuuuhm, I guess I have to stop here and admit you win. But it's just a game so whatever... Don't let it get to you're head")   
         #Resetting scores
         self.player.reset()
         self.dealer.reset()
@@ -123,23 +142,21 @@ if __name__ == "__main__":
     game = Game()
     play_game = True
     while play_game:
-        game.play_a_round()
+        players_result = game.players_turn()
+        if players_result in ["bust", "win"]:
+            dealers_result = "stop"
+        else:
+            dealers_result = game.dealers_turn()
+        game.comparing_scores(players_result, dealers_result)
         while True:
-            try:
-                answer = input("Wanna play another round? Write 'Yes' or 'No':\n")
-                if answer.lower() not in ["yes", "no"]:
-                    raise ValueError()
-                break 
-            except ValueError:
-                print(f"Uuuuuuhm????? Not a valid input! Write 'yes' or 'no'")     
-        if answer.lower() == "yes":
-            print(f"NICE!! So you've won {game.player.wins} times and I've won {game.dealer.wins}")
-        elif answer.lower() == "no":
-            print(f"Okay, then we'll leave it at...\nplayer: {game.player.wins}\ndealer: {game.dealer.wins}")
-            game.player.calculate_highscore()
-            game.dealer.calculate_highscore()
-            game.save_file("highscores.txt")
-            play_game = False
-            break
-
-
+            play_again = game.ask_input("Wanna play another round? Write 'Yes' or 'No':\n", ["yes", "no"])
+            if play_again == "yes":
+                print(f"NICE!! So you've won {game.player.wins} times and I've won {game.dealer.wins} times")
+                break
+            elif play_again == "no":
+                print(f"Okay, then we'll leave it at...\nplayer: {game.player.wins}\ndealer: {game.dealer.wins}")
+                game.player.calculate_highscore()
+                game.dealer.calculate_highscore()
+                game.save_file("highscores.txt")
+                play_game = False
+                break
